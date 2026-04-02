@@ -1,4 +1,6 @@
-IMAGE_NAME = myweb03
+IMAGE_NAME=myweb03
+SERVICE_NAME=djangotest
+NETWORK_NAME=mynetwork03
 
 build:
 	docker image build -t $(IMAGE_NAME) .
@@ -8,7 +10,10 @@ rebuild:
 
 # -d : 백그라운드 실행, -p : 포트 포워딩
 run:
-	docker run -d -p 8000:8000 $(IMAGE_NAME)
+	docker run -d \
+	--name $(SERVICE_NAME) \
+	--network $(NETWORK_NAME) \
+	-p 8000:8000 $(IMAGE_NAME)
 
 stop:
 	docker container stop $(IMAGE_NAME)
