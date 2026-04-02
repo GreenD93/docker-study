@@ -37,6 +37,70 @@ django-admin startproject myapp
 ---
 
 ## ex03: Django 단일 컨테이너
+1.MVT
+
+Model : 
+```python
+# models.py
+from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+```
+View : 
+```python
+# views.py
+from django.shortcuts import render
+from .models import Post
+
+def post_list(request):
+    posts = Post.objects.all()  # DB 조회
+    return render(request, 'post_list.html', {'posts': posts})
+```
+
+<!-- templates/post_list.html -->
+Template :
+```python
+<!-- templates/post_list.html -->
+<h1>게시글 목록</h1>
+<ul>
+  {% for post in posts %}
+    <li>{{ post.title }}</li>
+  {% endfor %}
+</ul>
+```
+
+2.gunicorn -> 우리는 MSA로 worker수 설정(프로세스)
+
+Flask/Django의 기본 서버(app.run(), manage.py runserver)는:
+개발용 (debug, 단일 프로세스)
+성능/안정성 부족
+동시 요청 처리에 취약
+그래서 운영 환경에서는 Gunicorn 같은 Production-grade 서버를 사용합니다.
+
+[Client] → [NGINX] → [Gunicorn] → [Flask/Django App]
+
+2-1. Gunicorn의 핵심 역할
+① WSGI 서버 역할
+Python 웹 앱은 WSGI 인터페이스로 동작
+Gunicorn이 HTTP 요청을 받아 → WSGI로 변환 → 앱에 전달
+[Client] → [NGINX] → [Gunicorn] → [Flask/Django App]
+② 멀티 프로세스 처리
+worker 프로세스를 여러 개 띄워서
+동시에 많은 요청 처리 가능
+
+예:
+gunicorn -w 4 app:app
+
+2-2. uvicorn <> gunicorn
+
+WSGI (Web Server Gateway Interface)
+→ 동기(synchronous) Python 웹 표준 : Django, Flask
+ASGI (Asynchronous Server Gateway Interface)
+→ 비동기(async)까지 지원하는 차세대 웹 표준  : FastAPI
+
 
 **배운 것:** Dockerfile 기본 구조, 이미지 빌드, 컨테이너 실행
 
