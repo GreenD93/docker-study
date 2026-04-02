@@ -4,7 +4,7 @@ SERVICE_NAME=postgrestest
 VOLUME_NAME=myvolume03
 
 
-build:1
+build:
 	docker image build -t $(IMAGE_NAME) .
 
 run:
